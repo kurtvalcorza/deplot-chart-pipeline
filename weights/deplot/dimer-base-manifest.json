@@ -1,0 +1,50 @@
+{
+  "format": "dimer_hf_snapshot",
+  "formatVersion": 1,
+  "modelKey": "deplot",
+  "modelId": "google/deplot",
+  "revision": "6e76d62430da16986be3426bae32301fb9115397",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4317,
+      "sha256": "419a84efe72647da6e56637a4b92394b3b3df6313d8b233c5ddc9942aad80102"
+    },
+    {
+      "path": "config.json",
+      "bytes": 4883,
+      "sha256": "f1dc8bcbda2ac4f8715c2d5003d3afb591ac0af97782fdf95a65cf26f805c5bb"
+    },
+    {
+      "path": "model.safetensors",
+      "bytes": 1129177976,
+      "sha256": "ab90055611f42fee327d9ecf3c9cdac63e847bd19a0ac8ea86b0e8134fe0711b"
+    },
+    {
+      "path": "preprocessor_config.json",
+      "bytes": 249,
+      "sha256": "c84e4eebc84171d6069533d9f0147ec7b4afd02ab78697cb5c30f9419ef7dc45"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 2201,
+      "sha256": "5c87151ef0f72a99d1f766a4c418bd2a1f90aaa30a8e22fe5eca9641daebb64f"
+    },
+    {
+      "path": "spiece.model",
+      "bytes": 851388,
+      "sha256": "7fd650335add59bed55a432186ca0437a09e185c2d241faab468a538fe6bcf94"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 3265159,
+      "sha256": "0af109b23840545ef2c286073f4373959badba1faa73c8557881d5126f6287c9"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 2623,
+      "sha256": "73949c3b853a39cd4661303b0e5cb7b836f7d783be6e898f8b7ae89e203cbe73"
+    }
+  ],
+  "totalBytes": 1133308796
+}
