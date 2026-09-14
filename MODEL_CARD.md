@@ -2,6 +2,7 @@
 license: apache-2.0
 model_card_spec: "1.1"
 pipeline_tag: visual-question-answering
+task: "Others - Chart Understanding"
 base_model: google/deplot
 date_published: "2023-04-03"
 date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt` 2023-04-03T11:05:38Z, https://huggingface.co/api/models/google/deplot — the Transformers-format conversion); the DePlot paper is arXiv:2212.10505 (2022-12) and the pinned revision is the Hub's `main` as of 2026-09-14"
