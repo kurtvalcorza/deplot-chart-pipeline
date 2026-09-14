@@ -7,7 +7,7 @@ date_published: "2023-04-03"
 date_published_source: "Hugging Face Hub repository creation date of the exact hosted checkpoint (`createdAt` 2023-04-03T11:05:38Z, https://huggingface.co/api/models/google/deplot — the Transformers-format conversion); the DePlot paper is arXiv:2212.10505 (2022-12) and the pinned revision is the Hub's `main` as of 2026-09-14"
 ---
 
-# DePlot (DIMER package v0.1.0) — Chart-to-Table Extraction (Inference)
+# DePlot — Chart-to-Table Extraction (Inference)
 
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-google%2Fdeplot-ffcc4d?style=flat)](https://huggingface.co/google/deplot)
 [![Upstream GitHub](https://img.shields.io/badge/Upstream%20GitHub-google--research%2Fpix2struct-181717?style=flat&logo=github&logoColor=white)](https://github.com/google-research/pix2struct)
