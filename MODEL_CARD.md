@@ -40,7 +40,7 @@ The uses below are the ones the package was built to support; everything else is
 
 ###### Primary Intended Uses
 
-The task is plot-to-table translation: input one chart image (`PIL.Image.Image`, any mode, converted to RGB) and a token budget; output the linearised table text, its parsed form (title, rows, shape), the number of tokens generated and whether the budget was exhausted. Envisioned applications are the first stage of the DePlot recipe — turning a bar, line or pie chart into a table that a human or a language model then reasons over — for chart digitisation in reports and papers, accessibility (a textual rendering of a chart), and indexing of figure data, with the extracted numbers checked against the chart before use. Within DIMER the pipeline is an inference component and a zero-configuration baseline for chart digitisation, not a certified extractor for any chart style, renderer or domain.
+The task is plot-to-table translation: input one chart image (`PIL.Image.Image`, any mode, converted to RGB) and a token budget; output the linearised table text, its parsed form (title, rows, shape), the number of tokens generated and whether the budget was exhausted. Envisioned applications are the first stage of the DePlot recipe — turning a bar, line or pie chart into a table that a human or a language model then reasons over — for chart digitisation in reports and papers, accessibility (a textual rendering of a chart), and indexing of figure data, with the extracted numbers checked against the chart before use. The pipeline is an inference component and a zero-configuration baseline for chart digitisation, not a certified extractor for any chart style, renderer or domain.
 
 ###### Primary Intended Users
 
@@ -113,7 +113,7 @@ This pipeline is not intended for decisions in health, safety, criminal justice,
 
 ###### Use cases
 
-Prohibited even where the model would work: digitising charts in order to misrepresent their data, to fabricate or launder evidence, or to present extracted numbers as verified source data; processing charts the operator has no right to process, or paywalled and licence-restricted publications in breach of their terms; deceptive uses in which extracted tables are passed downstream without disclosure that they were machine-estimated; and any use that violates the upstream Apache-2.0 licence terms, the DIMER deployment terms, or the consent and data-protection obligations attached to the material processed. Autonomous high-consequence actions triggered by unreviewed extracted tables are prohibited by the intended-use contract above.
+Prohibited even where the model would work: digitising charts in order to misrepresent their data, to fabricate or launder evidence, or to present extracted numbers as verified source data; processing charts the operator has no right to process, or paywalled and licence-restricted publications in breach of their terms; deceptive uses in which extracted tables are passed downstream without disclosure that they were machine-estimated; and any use that violates the upstream Apache-2.0 licence terms, the terms of the deployment that runs the pipeline, or the consent and data-protection obligations attached to the material processed. Autonomous high-consequence actions triggered by unreviewed extracted tables are prohibited by the intended-use contract above.
 
 ## Immutable provenance
 
