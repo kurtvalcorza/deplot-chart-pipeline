@@ -60,7 +60,7 @@ weights/deplot/
 
 ## Release status
 
-**Release-grade** for the exact `E2E` carrier recorded in `docs/release-verification.md`: commit `efb92ad` / notebook blob `fb192936d3e6` executed top-to-bottom on Kaggle Tesla T4 on 2026-09-26 UTC (11/11 post-restart code cells, 4381.7 s). On one seeded 160-chart SynthChartNet test split, cell accuracy was 0.160 frozen and 0.181 adapted (medoid baseline 0.037), while RNSS was 0.448 and 0.447 and exact-table match was 0.006 and 0.000; the adapter reloaded with 8/8 identical tables. This qualifies the execution and artifact contract, not a general adaptation gain or a DePlot benchmark. Static/unit checks remain source checks only; any change to the notebook blob returns it to Candidate until a new exact-blob run is recorded.
+**Candidate.** The carried modules were regenerated after the split-leakage and transactional-rollback fixes at source revision `ddf0cc4`; the resulting notebook blob is `90d9093cced4`. The prior Kaggle Tesla T4 qualification of `efb92ad` / `fb192936d3e6` remains historical evidence for that exact blob and does not carry over. A fresh byte-exact supported-runtime execution must pass before this carrier returns to Release-grade.
 
 ## Documentation
 

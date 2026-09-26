@@ -1,10 +1,10 @@
 # Release verification
 
-`tutorials/deplot_chart_colab.ipynb` (`E2E`, **standalone** carrier) is **Release-grade** for the exact commit and
-notebook blob recorded below, and returns to **Candidate** whenever the blob changes until that exact blob executes
-top-to-bottom in a clean supported runtime. Unit tests, JSON validation, code-cell compilation, the generator parity
-checks and `tools/validate_release_assets.py` are necessary checks but are **not** runtime evidence under DIMER
-Notebook Specification 2.0 (REL8). This file is the durable release-gate record for the notebook.
+`tutorials/deplot_chart_colab.ipynb` (`E2E`, **standalone** carrier) is **Candidate** at source revision `ddf0cc4`
+and notebook blob `90d9093cced4`. It returns to **Release-grade** only after that exact blob executes top-to-bottom
+in a clean supported runtime. Unit tests, JSON validation, code-cell compilation, the generator parity checks and
+`tools/validate_release_assets.py` are necessary checks but are **not** runtime evidence under DIMER Notebook
+Specification 2.0 (REL8). This file is the durable release-gate record for the notebook.
 
 ## Automatic coverage (static, every pull request)
 
@@ -163,12 +163,11 @@ the tensor-set and tampered-digest refusals, the transactional guarantee) passed
 
 ## Current status
 
-**Release-grade** for commit `efb92ad` / notebook blob `fb192936d3e6`, based on the passing clean Kaggle Tesla T4 run
-recorded above. The qualification is for execution, artifact integrity and faithful evidence: adaptation improved
-held-out cell accuracy by 0.021, but RNSS slipped by 0.001 and exact-table match by 0.006. The measured values are one
-seeded split of one shard on one runtime, not a DePlot benchmark. A change to any carried module, notebook template,
-dependency pin, manifest or generated notebook creates a new blob and returns the carrier to **Candidate** until a
-passing clean run of that blob is recorded.
+**Candidate** for source revision `ddf0cc4` / notebook blob `90d9093cced4`. The carried split contract now groups
+records by both declared image identity and SHA-256 of the image bytes, and adaptation rollback covers epoch-0
+validation and progress callbacks. Those source changes invalidate the prior exact-blob qualification. The passing
+`efb92ad` / `fb192936d3e6` Kaggle Tesla T4 run above remains historical evidence only; a clean run of the current blob
+is required before promotion.
 
 Facts a reviewer should weigh before promotion: SynthChartNet is not part of DePlot's fine-tuning mixture, so this is
 adaptation to a new chart family; the target format is a decision recorded in `samples.py` from the frozen model's own
