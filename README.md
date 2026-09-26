@@ -60,7 +60,7 @@ weights/deplot/
 
 ## Release status
 
-**Candidate.** The carried modules were regenerated after the split-leakage and transactional-rollback fixes at source revision `ddf0cc4`; the resulting notebook blob is `90d9093cced4`. The prior Kaggle Tesla T4 qualification of `efb92ad` / `fb192936d3e6` remains historical evidence for that exact blob and does not carry over. A fresh byte-exact supported-runtime execution must pass before this carrier returns to Release-grade.
+**Release-grade.** The standalone carrier generated at source revision `ddf0cc4` (notebook blob `90d9093cced4`, committed at `dd5724e`) executed byte-for-byte on a fresh Kaggle Tesla T4 runtime on 2026-09-26: 11/11 post-restart code cells passed in 4983.1 s, with the pinned DePlot snapshot and SynthChartNet shard fetched into an empty cache and digest-verified. See `docs/release-verification.md` for the executor identity, measurements, artifact hashes and scope limits.
 
 ## Documentation
 
