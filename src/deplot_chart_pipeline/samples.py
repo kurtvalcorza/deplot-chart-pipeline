@@ -32,7 +32,9 @@ series name), and a table with an ``<ecel>`` corner keeps a header row ``  | ser
 ``<0x0A>`` in a target tokenises to the same byte token the model emits.
 
 A record is ``{id, image_id, image, target_text, chart_type}`` — the path of the chart image, the linearised
-target table, and the chart type (`bar`, `pie`, `stacked_bar`, `line`; BYOD records default to `other`).
+target table, and the chart type (`bar`, `pie`, `stacked_bar`, `line`; BYOD records default to `other`). The
+optional logical ``image_id`` groups related records, while validation independently hashes the image bytes so
+byte-identical files cannot cross dataset splits under different names or ids.
 
 The shard's SHA-256 and row count are recorded by `tools/pin_corpus.py`; until they are recorded,
 `fetch_corpus` refuses to read the shard rather than read an unpinned file.
@@ -392,6 +394,7 @@ def _check_record(record: Any, index: int, *, base_dir: Path | None) -> dict[str
     return {
         "id": rid,
         "image_id": str(record.get("image_id", path.name)),
+        "image_sha256": _sha256_file(path),
         "image": str(path),
         "image_size": [width, height],
         "target_text": target,
@@ -427,7 +430,7 @@ def validate_dataset(
     return {
         "records": checked,
         "n_records": len(checked),
-        "unique_images": len({r["image_id"] for r in checked}),
+        "unique_images": len({r["image_sha256"] for r in checked}),
         "chart_types": dict(Counter(r["chart_type"] for r in checked)),
         "table_rows": {"min": min(s[0] for s in shapes), "max": max(s[0] for s in shapes)},
         "table_columns": {"min": min(s[1] for s in shapes), "max": max(s[1] for s in shapes)},
@@ -438,21 +441,40 @@ def validate_dataset(
 
 def dataset_digest(records: Sequence[Mapping[str, Any]]) -> str:
     payload = [
-        [r["id"], r.get("image_id", ""), str(r["target_text"]).strip(), r.get("chart_type", "")]
+        [
+            r["id"],
+            r.get("image_id", ""),
+            r.get("image_sha256", ""),
+            str(r["target_text"]).strip(),
+            r.get("chart_type", ""),
+        ]
         for r in records
     ]
     return _sha256_bytes(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
+def _image_identity_keys(record: Mapping[str, Any]) -> tuple[tuple[str, str], ...]:
+    """Declared and byte-derived identities that must each remain in one split."""
+    declared = str(record.get("image_id", record["id"]))
+    digest = record.get("image_sha256")
+    if not digest:
+        image = Path(str(record.get("image", "")))
+        digest = _sha256_file(image) if image.is_file() else None
+    keys = [("image_id", declared)]
+    if digest:
+        keys.append(("image_sha256", str(digest)))
+    return tuple(keys)
+
+
 def check_split_disjoint(splits: Mapping[str, Sequence[Mapping[str, Any]]]) -> dict[str, Any]:
-    """Assert no chart image appears in two splits (leakage check)."""
-    seen: dict[str, str] = {}
+    """Assert no declared chart identity or byte-identical image appears in two splits."""
+    seen: dict[tuple[str, str], str] = {}
     for name, records in splits.items():
         for record in records:
-            key = str(record.get("image_id", record["id"]))
-            if key in seen and seen[key] != name:
-                raise ValueError(f"chart {key!r} appears in both {seen[key]} and {name}")
-            seen[key] = name
+            for key in _image_identity_keys(record):
+                if key in seen and seen[key] != name:
+                    raise ValueError(f"chart {key[1]!r} appears in both {seen[key]} and {name}")
+                seen[key] = name
     return {name: len(records) for name, records in splits.items()}
 
 
@@ -464,14 +486,35 @@ def split_dataset(
     seed: int = 0,
     base_dir: str | Path | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Seeded split of a BYOD dataset into train/validation/test **by chart image**: records on the same
-    `image_id` land in the same split, so a test chart is never seen in training."""
+    """Seeded split of a BYOD dataset into train/validation/test **by chart image**: records sharing either
+    a declared `image_id` or the exact image bytes land in the same split, so a test chart is never seen in
+    training under a different name or id."""
     if not (0.0 <= val_fraction < 1.0 and 0.0 < test_fraction < 1.0 and val_fraction + test_fraction < 1.0):
         raise ValueError("fractions must satisfy 0 <= val < 1, 0 < test < 1, val + test < 1")
     checked = validate_dataset(records, base_dir=base_dir)["records"]
-    groups: dict[str, list[dict[str, Any]]] = {}
-    for record in checked:
-        groups.setdefault(record["image_id"], []).append(record)
+    parents = list(range(len(checked)))
+
+    def find(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root, right_root = find(left), find(right)
+        if left_root != right_root:
+            parents[left_root] = right_root
+
+    owners: dict[tuple[str, str], int] = {}
+    for index, record in enumerate(checked):
+        for key in _image_identity_keys(record):
+            if key in owners:
+                union(index, owners[key])
+            else:
+                owners[key] = index
+    groups: dict[int, list[dict[str, Any]]] = {}
+    for index, record in enumerate(checked):
+        groups.setdefault(find(index), []).append(record)
     order = list(groups.values())
     random.Random(seed).shuffle(order)
     n_test = max(1, round(len(checked) * test_fraction))
@@ -513,7 +556,7 @@ def write_dataset_jsonl(records: Sequence[Mapping[str, Any]], path: str | Path) 
     """One record per line in the shape `load_byod_dataset` reads back (image paths as given)."""
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    keys = ("id", "image_id", "image", "target_text", "chart_type")
+    keys = ("id", "image_id", "image_sha256", "image", "target_text", "chart_type")
     with open(out, "w", encoding="utf-8") as handle:
         for record in records:
             handle.write(json.dumps({k: record[k] for k in keys if k in record}, ensure_ascii=False) + "\n")

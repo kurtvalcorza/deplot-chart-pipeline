@@ -225,6 +225,22 @@ def test_adapt_is_transactional_when_the_progress_callback_raises(pipe, records)
     assert not any(p.requires_grad for p in pipe._model.parameters())
 
 
+def test_adapt_is_transactional_when_epoch_zero_progress_callback_raises(records):
+    pipe = _tiny_pipeline()
+    before = {k: v.clone() for k, v in pipe._model.state_dict().items()}
+
+    def boom(entry):
+        if entry["epoch"] == 0:
+            raise RuntimeError("epoch-zero boom")
+
+    with pytest.raises(RuntimeError, match="epoch-zero boom"):
+        pipe.adapt(records[:8], None, epochs=1, trainable_decoder_layers=1, batch_size=4, progress=boom)
+    after = pipe._model.state_dict()
+    assert all(torch.equal(before[k], after[k]) for k in before) and pipe.adapter is None
+    assert not pipe._model.training
+    assert not any(p.requires_grad for p in pipe._model.parameters())
+
+
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not visible")
 def test_extract_adapt_and_reload_run_on_a_cuda_device(records, tmp_path):
     """Every tensor the runner, the encoder pass and the trainer build must land on the model's device."""

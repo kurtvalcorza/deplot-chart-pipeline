@@ -15,6 +15,7 @@ adapter bound to the pinned base.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
@@ -632,12 +633,10 @@ class DePlotPipeline:
         pad_id = int(tokenizer.pad_token_id)
         started = time.perf_counter()
         wanted = set(names)
-        for name, param in model.named_parameters():
-            param.requires_grad_(name in wanted)
-        params = [p for p in model.parameters() if p.requires_grad]
-        n_trainable = sum(p.numel() for p in params)
-        optimiser = torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
-        device = next(model.parameters()).device
+        original_requires_grad = {name: param.requires_grad for name, param in model.named_parameters()}
+        original_training = model.training
+        original_adapter = copy.deepcopy(self.adapter)
+        initial_state = {k: v.detach().clone() for k, v in model.state_dict().items() if k in wanted}
 
         def score_val() -> dict[str, Any] | None:
             if not val_checked:
@@ -649,17 +648,27 @@ class DePlotPipeline:
                 if k in ("cell_accuracy", "rnss", "exact_table_match", "n")
             }
 
-        history: list[dict[str, Any]] = []
-        entry: dict[str, Any] = {"epoch": 0, "train_loss": None, "val": score_val(), "note": "frozen model"}
-        history.append(entry)
-        if progress:
-            progress(entry)
-        best_score = entry["val"]["cell_accuracy"] if entry["val"] else -math.inf
-        best_state = {k: v.detach().clone() for k, v in model.state_dict().items() if k in wanted}
-        initial_state = {k: v.clone() for k, v in best_state.items()}
-        best_epoch = 0
-        generator = torch.Generator().manual_seed(seed)
         try:
+            for name, param in model.named_parameters():
+                param.requires_grad_(name in wanted)
+            params = [p for p in model.parameters() if p.requires_grad]
+            n_trainable = sum(p.numel() for p in params)
+            optimiser = torch.optim.AdamW(params, lr=lr, weight_decay=0.01)
+            device = next(model.parameters()).device
+            history: list[dict[str, Any]] = []
+            entry: dict[str, Any] = {
+                "epoch": 0,
+                "train_loss": None,
+                "val": score_val(),
+                "note": "frozen model",
+            }
+            history.append(entry)
+            if progress:
+                progress(entry)
+            best_score = entry["val"]["cell_accuracy"] if entry["val"] else -math.inf
+            best_state = {k: v.clone() for k, v in initial_state.items()}
+            best_epoch = 0
+            generator = torch.Generator().manual_seed(seed)
             for epoch in range(1, epochs + 1):
                 model.train()
                 order = torch.randperm(len(train_checked), generator=generator).tolist()
@@ -693,14 +702,14 @@ class DePlotPipeline:
                     best_epoch = epoch
         except BaseException:
             # Transactional: a failure in training, validation or the progress callback leaves the base
-            # exactly as it was, with every parameter frozen again.
+            # exactly as it was, including its mode, gradient flags and any previously loaded adapter.
             restore = dict(model.state_dict())
             restore.update(initial_state)
             model.load_state_dict(restore, strict=True)
-            model.eval()
-            for param in model.parameters():
-                param.requires_grad_(False)
-            self.adapter = None
+            model.train(original_training)
+            for name, param in model.named_parameters():
+                param.requires_grad_(original_requires_grad[name])
+            self.adapter = original_adapter
             raise
         merged = dict(model.state_dict())
         merged.update(best_state)

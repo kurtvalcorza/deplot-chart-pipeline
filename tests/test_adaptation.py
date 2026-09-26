@@ -7,6 +7,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+from pathlib import Path
 
 import pytest
 from PIL import Image
@@ -214,6 +215,18 @@ def test_split_dataset_keeps_each_image_in_one_split(records):
     assert sum(check_split_disjoint(splits).values()) == 12
     with pytest.raises(ValueError, match="appears in both"):
         check_split_disjoint({"train": shared[:1], "test": shared[1:2]})
+
+
+def test_split_dataset_keeps_byte_identical_files_in_one_split(records, tmp_path):
+    renamed = tmp_path / "same-chart-different-name.png"
+    renamed.write_bytes(Path(records[0]["image"]).read_bytes())
+    duplicate = {**records[1], "image": str(renamed), "image_id": "different-logical-id"}
+    splits = split_dataset([records[0], duplicate, *records[2:]], val_fraction=0.2, test_fraction=0.2)
+    locations = {record["id"]: name for name, part in splits.items() for record in part}
+    assert locations[records[0]["id"]] == locations[duplicate["id"]]
+    checked = [record for part in splits.values() for record in part]
+    digests = {record["id"]: record["image_sha256"] for record in checked}
+    assert digests[records[0]["id"]] == digests[duplicate["id"]]
 
 
 def test_byod_jsonl_round_trip(records, tmp_path):
