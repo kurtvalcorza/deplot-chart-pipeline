@@ -15,3 +15,7 @@ weights/**/*.pt
 weights/**/*.pth
 weights/**/*.onnx
 weights/**/.cache/
+
+# The SynthChartNet sample shard and its extracted chart images are fetched at run time
+weights/**/*.parquet
+weights/synthchartnet/
