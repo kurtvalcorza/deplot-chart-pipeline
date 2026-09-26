@@ -166,7 +166,7 @@ def corpus_pinned() -> bool:
     return isinstance(CORPUS_FILE.get("sha256"), str) and len(CORPUS_FILE["sha256"]) == 64
 
 
-def _hub_download(cache: Path) -> Path:
+def _download_corpus(cache: Path) -> Path:
     from huggingface_hub import hf_hub_download
 
     return Path(
@@ -203,7 +203,7 @@ def fetch_corpus(
 
     if ok(local):
         return local
-    fetched = (downloader or _hub_download)(cache)
+    fetched = (downloader or _download_corpus)(cache)
     if not ok(fetched):
         size = fetched.stat().st_size if fetched.is_file() else None
         raise ValueError(

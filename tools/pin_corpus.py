@@ -31,7 +31,7 @@ def main() -> int:
     cache = Path(args.cache)
     path = cache / samples.CORPUS_FILE["path"]
     if not path.is_file():
-        path = samples._hub_download(cache)
+        path = samples._download_corpus(cache)
     size = path.stat().st_size
     if size != samples.CORPUS_FILE["bytes"]:
         pinned_size = samples.CORPUS_FILE["bytes"]
