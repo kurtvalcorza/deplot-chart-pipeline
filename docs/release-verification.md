@@ -1,10 +1,10 @@
 # Release verification
 
-`tutorials/deplot_chart_colab.ipynb` (`E2E`, **standalone** carrier) is a **release candidate** until the exact
-notebook revision has executed top-to-bottom in a clean supported runtime. Unit tests, JSON validation, code-cell
-compilation, the generator parity checks and `tools/validate_release_assets.py` are necessary checks but are **not**
-runtime evidence under DIMER Notebook Specification 2.0 (REL8). This file is the durable release-gate record for the
-notebook.
+`tutorials/deplot_chart_colab.ipynb` (`E2E`, **standalone** carrier) is **Release-grade** for the exact commit and
+notebook blob recorded below, and returns to **Candidate** whenever the blob changes until that exact blob executes
+top-to-bottom in a clean supported runtime. Unit tests, JSON validation, code-cell compilation, the generator parity
+checks and `tools/validate_release_assets.py` are necessary checks but are **not** runtime evidence under DIMER
+Notebook Specification 2.0 (REL8). This file is the durable release-gate record for the notebook.
 
 ## Automatic coverage (static, every pull request)
 
@@ -137,7 +137,8 @@ they are measurements for the stated runtime, not general estimates.
 
 | Date (UTC) | Commit / notebook blob | Executor | Path exercised | Wall | Outcome |
 |---|---|---|---|---|---|
-| — | — | Colab or Kaggle (supported runtime) | Default sample path, all sections | — | not yet executed |
+| 2026-09-26 (04:24–04:27) | `60de8e1` / `d46a685b9e19` | Kaggle Tesla T4 (`kurtvalcorza/dimer-nb2-deplot-chart` v2), serial suite; exact committed blob fetched and Git-blob verified; clean Hugging Face cache | Default sample path, all sections | 213.6 s | **FAILED** — after the expected install-cell restart, 4/11 code cells completed; Section 4 raised `TypeError: _hub_download() takes 1 positional argument but 2 were given` because the standalone carrier placed `samples.py` and `pipeline.py` in one namespace and both defined `_hub_download`. The helper was renamed to `_download_corpus`, a namespace regression test was added, and the notebook was regenerated. Not promotion evidence. |
+| 2026-09-26 (04:49–06:02) | `efb92ad` / `fb192936d3e6` (`NOTEBOOK_SOURCE.repository_revision` = `aada162`, the source revision the notebook was generated at; `aada162..efb92ad` changes only the notebook) | Kaggle Tesla T4 (`kurtvalcorza/dimer-nb2-deplot-chart` v3), serial suite; exact committed blob fetched and Git-blob verified, executed verbatim in a fresh interpreter with a `google.colab` shim and no repository checkout; Hugging Face cache clean at start; image `gcr.io/kaggle-gpu-images/python@sha256:37c64f7dd9c54116ecd1bcc88817c5469b88387388fade02bfa8bf3fc647d461`, Python 3.12.13, Tesla T4 15360 MiB, driver 580.159.04; after inline pins: torch 2.14.0+cu130 (CUDA 13.0), transformers 4.57.6, device `cuda:0`, float32 | Default sample path (`USE_BYOD = False`, all form defaults), all sections. The 8-file DePlot snapshot and pinned SynthChartNet shard were fetched into an empty cache and digest-verified; 621 staged files / 1,670,135,452 bytes. Corpus split 360 / 80 / 160 charts; test chart types bar 72, line 1, pie 73, stacked-bar 14. Frozen test: cell accuracy 0.160, RNSS 0.448, exact-table match 0.006, truncation 0.050; empty/header-only/medoid cell-accuracy baselines 0.000 / 0.007 / 0.037. Adaptation trained 18,879,744 of 282,285,696 parameters for three epochs, best epoch 2 by validation cell accuracy (0.123 frozen → 0.162), 1999.5 s. Adapted test: cell accuracy 0.181 (+0.021), RNSS 0.447 (−0.001), exact-table match 0.000; `adapted_beats_frozen` is true because that flag uses cell accuracy, not because every metric improved. Drawn-chart cell accuracy remained 0.9. Adapter 29 tensors / 75,522,608 bytes, fresh reload parity 8/8 identical tables. Preserved SHA-256: result `1050078a1a17…`, evaluation report `b627f6d1f2ec…`, input manifest `3f74fd5ca99d…`, table CSV `be3928cd4bdf…`, training JSONL `0fca6f83b5ef…`, adapter `c04d63c37554…`, adapter manifest `b39f75c1cfd5…` | 4381.7 s (pass 1 198.3 s stopped at the install cell with the expected stale-module guard; kernel restarted; pass 2 4183.4 s) | **PASSED** — 11/11 post-restart code cells; promotion evidence for this exact blob. One seeded split of one shard on one runtime, no dispersion estimate; not a DePlot benchmark. |
 | — | — | Local harness (pre-flight) | Default sample path, all sections | — | not yet executed |
 
 Local builder evidence that is **not** a notebook execution: the frozen checkpoint was run on CPU on twelve charts of
@@ -162,20 +163,20 @@ the tensor-set and tampered-digest refusals, the transactional guarantee) passed
 
 ## Current status
 
-**Candidate.** No execution of the `E2E` notebook is recorded. What exists: static validation
-(`tools/validate_release_assets.py`), the generator parity checks (`--check` OK), the offline suites, the adaptation
-suite on a small random Pix2Struct, and the same adaptation suite passing on CPU against the staged pinned
-checkpoint. The Kaggle CPU and local runs above were of the earlier `TASK-INFERENCE` notebook, whose inference path
-(staging, verification, the drawn chart) the `E2E` notebook still carries as Section 5, but they do not carry over to
-the new blob.
+**Release-grade** for commit `efb92ad` / notebook blob `fb192936d3e6`, based on the passing clean Kaggle Tesla T4 run
+recorded above. The qualification is for execution, artifact integrity and faithful evidence: adaptation improved
+held-out cell accuracy by 0.021, but RNSS slipped by 0.001 and exact-table match by 0.006. The measured values are one
+seeded split of one shard on one runtime, not a DePlot benchmark. A change to any carried module, notebook template,
+dependency pin, manifest or generated notebook creates a new blob and returns the carrier to **Candidate** until a
+passing clean run of that blob is recorded.
 
 Facts a reviewer should weigh before promotion: SynthChartNet is not part of DePlot's fine-tuning mixture, so this is
 adaptation to a new chart family; the target format is a decision recorded in `samples.py` from the frozen model's own
 outputs (bar, pie and stacked-bar OTSL tables transposed, line tables kept, `TITLE |` first), and cell accuracy is
-position-wise, so part of any gain can be layout learning rather than better reading — RNSS, which ignores layout, is
-reported beside it; the fine-tuning recipe (`LEARNING_RATE = 1e-5`, three epochs, two blocks, batch 4) has not been
-run on this checkpoint and corpus, so the notebook records `adapted_beats_frozen` instead of asserting a gain — restore
-an assertion once a measured recipe is recorded here; line charts are 0.5 % of the shard, so the stratified split
+position-wise, so part of the measured gain can be layout learning rather than better reading — RNSS, which ignores
+layout, did not improve; the fine-tuning recipe (`LEARNING_RATE = 1e-5`, three epochs, two blocks, batch 4) has one
+measurement and the notebook records `adapted_beats_frozen` rather than asserting a general gain; line charts are
+0.5 % of the shard, so the stratified split
 holds one or two per split and none in validation, and per-type line numbers are anecdotes; SynthChartNet carries some
 label noise (for example a pie whose first category cell is a unit caption); the shard is 516 MB, a large download for
 a tutorial; the header uses Pillow's bundled font rather than the Arial the checkpoint was trained with; each chart

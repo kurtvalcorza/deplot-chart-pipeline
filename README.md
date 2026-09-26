@@ -60,7 +60,7 @@ weights/deplot/
 
 ## Release status
 
-**Candidate.** Static/unit checks — including the standalone generator parity checks (`tools/build_notebook.py --check`, `tests/test_notebook_parity.py`) and the pinned-checkpoint adaptation cases run on CPU — do not constitute clean-runtime notebook evidence. No execution of the `E2E` notebook is recorded yet; the runs in `docs/release-verification.md` were of the previous `TASK-INFERENCE` notebook. Complete that record against the exact release revision before calling the notebook release-grade.
+**Release-grade** for the exact `E2E` carrier recorded in `docs/release-verification.md`: commit `efb92ad` / notebook blob `fb192936d3e6` executed top-to-bottom on Kaggle Tesla T4 on 2026-09-26 UTC (11/11 post-restart code cells, 4381.7 s). On one seeded 160-chart SynthChartNet test split, cell accuracy was 0.160 frozen and 0.181 adapted (medoid baseline 0.037), while RNSS was 0.448 and 0.447 and exact-table match was 0.006 and 0.000; the adapter reloaded with 8/8 identical tables. This qualifies the execution and artifact contract, not a general adaptation gain or a DePlot benchmark. Static/unit checks remain source checks only; any change to the notebook blob returns it to Candidate until a new exact-blob run is recorded.
 
 ## Documentation
 
