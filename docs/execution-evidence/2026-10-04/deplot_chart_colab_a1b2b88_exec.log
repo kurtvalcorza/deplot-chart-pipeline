@@ -1,0 +1,368 @@
+[colab] Parsing notebook '/home/kurt/colab-runs/deplot-chart-pipeline-a1b2b88-7026ae/deplot_chart_colab_a1b2b88_colab-cli-t4.ipynb'...
+[colab] Executing cell 1/13 - Infrastructure: install the locked runtime into an isolated environment...
+{'isolated_environment': '/content/dimer_isolated_env', 'isolated_python': '3.12.12', 'kernel_python': '3.13.15', 'locked_packages': 48, 'setup_seconds': 54}
+[colab] Executing cell 2/13 - Infrastructure: route the remaining cells to the isolated environment...
+Every later code cell now runs in /content/dimer_isolated_env/bin/python (pid 2991).
+[colab] Executing cell 3/13 - Infrastructure: record the runtime...
+{'notebook_source': {'repository': 'deplot-chart-pipeline', 'repository_revision': '2f8fefe20e45eabccf51a7b34528a4f8e828e536', 'embedded_module': 'src/deplot_chart_pipeline/pipeline.py', 'embedded_modules': ['src/deplot_chart_pipeline/pipeline.py', 'src/deplot_chart_pipeline/metrics.py', 'src/deplot_chart_pipeline/samples.py'], 'module_sha256': 'de201aec97ce94549f1260b49cbcf414075f6380ffc4b1d8614ba91a1610ff88', 'generator': 'build_notebook.py/2.1', 'notebook_spec': '2.2'}, 'python': '3.12.12', 'torch': '2.14.0+cu130', 'transformers': '4.57.6', 'cuda': True}
+[colab] Executing cell 4/13 - deplot_chart-09...
+[colab] Executing cell 5/13 - deplot_chart-11...
+[colab] Executing cell 6/13 - deplot_chart-13...
+[colab] Executing cell 7/13 - Infrastructure: pin, stage and verify the model...
+{'model_id': 'google/deplot', 'revision': '6e76d62430da16986be3426bae32301fb9115397', 'license': 'apache-2.0', 'files': 8, 'total_bytes': 1133308796}
+{'weights_dir': '/content/weights/deplot', 'fetched': ['README.md', 'config.json', 'model.safetensors', 'preprocessor_config.json', 'special_tokens_map.json', 'spiece.model', 'tokenizer.json', 'tokenizer_config.json']}
+{'verified_files': 8, 'revision': '6e76d62430da16986be3426bae32301fb9115397'}
+{'device': 'cuda:0', 'source': 'local-snapshot'}
+[colab] Executing cell 8/13 - deplot_chart-17...
+{'otsl': '<chart><loc_0><loc_0><loc_500><loc_500><stacked_bar_chart><ecel><fcel>(Loss) income from the<fcel>Interest on mortgage and<fcel>Dividends and interest on<fcel>Mark-to-market of investments<fcel>Other net<nl><fcel>2012<fc', 'target': 'TITLE |  <0x0A>  | 2012 | 2011 | 2010 <0x0A> (Loss) income from the | 75815 | 12984 | 11149 <0x0A> Interest on mortgage and | 13861 | 14023 | 10319 <0x0A> Dividends and interest on | 11979 | 29587 | 25772 <0x0A> Mark-to-'}
+{'data_source': 'SynthChartNet — SynthChartNet training shard 0 of 135 (14,568 charts with their OTSL data tables) on the Hugging Face Hub, dataset revision b913ef98', 'raw_rows': {'charts': 14568, 'chart_types': {'bar': 6491, 'pie': 6665, 'stacked_bar': 1333, 'line': 79}}, 'splits': {'train': 360, 'validation': 80, 'test': 160}, 'shard_sha256': '1d6cf578fdd953fa...'}
+{'train': {'charts': 360, 'images': 360, 'chart_types': {'bar': 161, 'line': 2, 'pie': 165, 'stacked_bar': 32}, 'table_rows': {'min': 1, 'max': 10}, 'table_columns': {'min': 2, 'max': 5}, 'digest': '4a268369cc2823ee...'}}
+{'validation': {'charts': 80, 'images': 80, 'chart_types': {'bar': 36, 'pie': 37, 'stacked_bar': 7}, 'table_rows': {'min': 2, 'max': 10}, 'table_columns': {'min': 2, 'max': 5}, 'digest': 'c721b0d22e5cbdbb...'}}
+{'test': {'charts': 160, 'images': 160, 'chart_types': {'bar': 72, 'line': 1, 'pie': 73, 'stacked_bar': 14}, 'table_rows': {'min': 1, 'max': 10}, 'table_columns': {'min': 2, 'max': 5}, 'digest': '23dcf560c9abd5f6...'}}
+{'example': {'id': 'train-0000', 'image': '8132c4c10bc766e6.png', 'size': [975, 1021], 'chart_type': 'bar'}}
+<PIL.Image.Image image mode=RGB size=480x503 at 0x790AD40C3DD0>
+
+[Image saved to: /tmp/tmpm_adyvcc.png]
+target table:
+    TITLE |
+    Year ended December 31 (in | 2007
+    Allowance for lending-related | 990.1
+    Provision for lending-related | 326
+    Formula-based | 822
+    Total Allowance for lending- | 1158.2
+{'probe': 'duplicate id', 'rejected': "duplicate id 'same'"}
+{'probe': 'missing image file', 'rejected': 'records[0]: image file not found: work/does-not-exist.png'}
+{'probe': 'target without a table row', 'rejected': 'records[0]: target_text must hold at least one table row'}
+{'probe': 'too small', 'rejected': '3 records; 8..5000 are required'}
+[colab] Executing cell 9/13 - deplot_chart-19...
+<PIL.Image.Image image mode=RGB size=480x312 at 0x790AE7F8BBC0>
+
+[Image saved to: /tmp/tmp6xhv4h5l.png]
+{'MIN_IMAGE_SIDE': 16, 'MAX_IMAGE_SIDE': 4096, 'MAX_PATCHES': 2048, 'MAX_NEW_TOKENS': 1024, 'DEFAULT_MAX_NEW_TOKENS': 512, 'MAX_TARGET_TOKENS': 512, 'MAX_TARGET_CHARS': 512, 'DECODING': 'greedy', 'INSTRUCTION': 'Generate underlying data table of the figure below:', 'ROW_SEPARATOR': '<0x0A>', 'CELL_SEPARATOR': '|', 'MIN_RECORDS': 8, 'MAX_RECORDS': 5000, 'MAX_EVAL_RECORDS': 500}
+{'image': 'synthetic_bar_chart_800x520.png', 'rgb_sha256': '175a1e4d557e4065...', 'manifest_verdict': 'accepted', 'findings': 1}
+TITLE | Quarterly revenue 2025 (USD millions) <0x0A> Quarter | Quarterly revenue <0x0A> Q1 | 120 <0x0A> Q2 | 135 <0x0A> Q3 | 150 <0x0A> Q4 | 180
+extracted table:
+    TITLE | Quarterly revenue 2025 (USD millions)
+    Quarter | Quarterly revenue
+    Q1 | 120
+    Q2 | 135
+    Q3 | 150
+    Q4 | 180
+{'checks': {'text_is_str': True, 'budget_respected': True, 'setting_echoed': True, 'not_truncated': True}, 'seconds': 6.499, 'new_tokens': 56, 'frozen_drawn_verdict': 'sample-sanity', 'cell_accuracy': 0.9, 'title_match': 1.0}
+[colab] Executing cell 10/13 - deplot_chart-21...
+{'baseline': 'empty', 'cell_accuracy': 0.0, 'rnss': 0.0, 'note': 'no table at all (the floor)'}
+{'baseline': 'header-only', 'cell_accuracy': 0.007, 'rnss': 0.008, 'note': "the most frequent training header row of the chart's type, no data rows"}
+{'baseline': 'medoid', 'cell_accuracy': 0.037, 'rnss': 0.172, 'note': "the training medoid table of the chart's type (highest mean cell accuracy against its type)"}
+  frozen model, test split: 20/160 charts, 105 s
+  frozen model, test split: 40/160 charts, 175 s
+  frozen model, test split: 60/160 charts, 297 s
+  frozen model, test split: 80/160 charts, 385 s
+  frozen model, test split: 100/160 charts, 565 s
+  frozen model, test split: 120/160 charts, 739 s
+  frozen model, test split: 140/160 charts, 878 s
+  frozen model, test split: 160/160 charts, 990 s
+{'frozen_model_test': {'cell_accuracy': 0.16, 'rnss': 0.448, 'exact_table_match': 0.006, 'truncated_rate': 0.05}, 'n': 160, 'verdict': 'measured', 'adapted': False, 'seconds': 990.5}
+{'by_chart_type': {'medoid': {'bar': {'n': 72, 'cell_accuracy': 0.0426, 'rnss': 0.1667, 'exact_table_match': 0.0}, 'line': {'n': 1, 'cell_accuracy': 0.375, 'rnss': 0.522, 'exact_table_match': 0.0}, 'pie': {'n': 73, 'cell_accuracy': 0.0179, 'rnss': 0.1637, 'exact_table_match': 0.0}, 'stacked_bar': {'n': 14, 'cell_accuracy': 0.083, 'rnss': 0.2117, 'exact_table_match': 0.0}}, 'frozen': {'bar': {'n': 72, 'cell_accuracy': 0.1478, 'rnss': 0.6095, 'exact_table_match': 0.0139}, 'line': {'n': 1, 'cell_accuracy': 0.375, 'rnss': 0.5729, 'exact_table_match': 0.0}, 'pie': {'n': 73, 'cell_accuracy': 0.1449, 'rnss': 0.293, 'exact_table_match': 0.0}, 'stacked_bar': {'n': 14, 'cell_accuracy': 0.2814, 'rnss': 0.4108, 'exact_table_match': 0.0}}}}
+{'definitions': {'cell_accuracy': 'mean over charts of the relaxed position-wise cell accuracy (text case/whitespace-insensitive, numbers within 5 % relative tolerance; missing cells are misses, extra cells are not penalised)', 'rnss': "mean over charts of the relative number set similarity (ChartQA / DePlot): minimal-cost one-to-one matching of the tables' numbers with cost min(1, |p - t| / |t|), unmatched numbers at cost 1", 'exact_table_match': "fraction of charts whose normalised parsed rows equal the target's", 'by_chart_type': 'the same means per chart type'}}
+--- bar chart test-0000: frozen cell accuracy 0.000
+<PIL.Image.Image image mode=RGB size=360x239 at 0x790A853B9D00>
+
+[Image saved to: /tmp/tmpqaw0cdjm.png]
+target:
+    TITLE |
+    (Thousands of Dollars) | 2015
+    Estimated decommissioning cost | 5.60375e+06
+    Effect of escalating costs (to | 1.12236e+06
+    Effect of escalating costs to | 8.9648e+06
+    Estimated future | 1.12055e+07
+    ... 4 more rows
+frozen model:
+    TITLE |
+    label | Value
+    Intense (dozen) | 2000
+    Intense communication set | 109510
+    Intense domain record | 109510
+    Intense resonance | 898910
+    ... 6 more rows
+--- line chart test-0072: frozen cell accuracy 0.375
+<PIL.Image.Image image mode=RGB size=360x273 at 0x790A853BA660>
+
+[Image saved to: /tmp/tmp7pl7s212.png]
+target:
+    TITLE |
+    | $1,298
+    1695.23 | 1282.74
+    1805.83 | 537.69
+    2206.24 | 38.92
+frozen model:
+    TITLE |
+    | Weight
+    $1,298 | 1220
+    $1,800 | 570
+    $1,900 | 195
+    $2,000 | 2050
+    ... 1 more rows
+--- pie chart test-0073: frozen cell accuracy 0.500
+<PIL.Image.Image image mode=RGB size=360x276 at 0x790A853B8560>
+
+[Image saved to: /tmp/tmp2vguk32j.png]
+target:
+    TITLE |
+    Carrying value beginning of | 40.58%
+    Additions | 9.42%
+    Due to change in valuation | 18.84%
+    Other changes (1) | 3.5%
+    Carrying value end of period | 27.66%
+frozen model:
+    TITLE |
+    Carrying value beginning of | 0.4258
+    Additions | 0.0000
+    Due to change in valuation | 0.0000
+    Other changes (1) | 0.1884
+    Carrying value end of period | 0.1884
+    ... 1 more rows
+--- stacked_bar chart test-0146: frozen cell accuracy 0.167
+<PIL.Image.Image image mode=RGB size=360x355 at 0x790A853BA7B0>
+
+[Image saved to: /tmp/tmpdnrsxg0d.png]
+target:
+    TITLE |
+    | of net revenue | 2013 | Increase/ decrease | 2014
+    Selling and marketing | 240996 | 10.2 | 257329 | 16333
+    General and administrative | 161374 | 6.9 | 147260 | 14114
+    Research and development | 105256 | 4.5 | 78184 | 27072
+    Depreciation and amortization | 13359 | 0.6 | 10634 | 2725
+    ... 1 more rows
+frozen model:
+    TITLE |
+    | of net revenue | 2013 | Increase/ decrease | 2014
+    General and marketing | 2.89 | 2.92 | 36.08 | 25.84
+    Research and development | 2.95 | 2.91 | 19.99 | 23.58
+    Depreciation and development | 2.71 | 2.71 | 16.09 | 2.06
+    Total operating expenses (1) | 1.93 | 1.93 | 1.99 | 1.99
+    ... 1 more rows
+{'frozen_beats_empty': True, 'frozen_beats_medoid': True}
+[colab] Executing cell 11/13 - deplot_chart-23...
+  epoch 0 validation: 20/80 charts, 88 s
+  epoch 0 validation: 40/80 charts, 240 s
+  epoch 0 validation: 60/80 charts, 386 s
+  epoch 0 validation: 80/80 charts, 472 s
+{'epoch': 0, 'train_loss': None, 'val_cell_accuracy': 0.123, 'val_rnss': 0.48, 'note': 'frozen model'}
+  epoch 1 train: 20/360 charts, 482 s
+  epoch 1 train: 40/360 charts, 492 s
+  epoch 1 train: 60/360 charts, 501 s
+  epoch 1 train: 80/360 charts, 511 s
+  epoch 1 train: 100/360 charts, 520 s
+  epoch 1 train: 120/360 charts, 530 s
+  epoch 1 train: 140/360 charts, 540 s
+  epoch 1 train: 160/360 charts, 550 s
+  epoch 1 train: 180/360 charts, 559 s
+  epoch 1 train: 200/360 charts, 569 s
+  epoch 1 train: 220/360 charts, 579 s
+  epoch 1 train: 240/360 charts, 589 s
+  epoch 1 train: 260/360 charts, 599 s
+  epoch 1 train: 280/360 charts, 608 s
+  epoch 1 train: 300/360 charts, 618 s
+  epoch 1 train: 320/360 charts, 628 s
+  epoch 1 train: 340/360 charts, 638 s
+  epoch 1 train: 360/360 charts, 648 s
+  epoch 1 validation: 20/80 charts, 729 s
+  epoch 1 validation: 40/80 charts, 881 s
+  epoch 1 validation: 60/80 charts, 950 s
+  epoch 1 validation: 80/80 charts, 1098 s
+{'epoch': 1, 'train_loss': 2.1763, 'val_cell_accuracy': 0.145, 'val_rnss': 0.493}
+  epoch 2 train: 20/360 charts, 1108 s
+  epoch 2 train: 40/360 charts, 1117 s
+  epoch 2 train: 60/360 charts, 1127 s
+  epoch 2 train: 80/360 charts, 1137 s
+  epoch 2 train: 100/360 charts, 1147 s
+  epoch 2 train: 120/360 charts, 1156 s
+  epoch 2 train: 140/360 charts, 1166 s
+  epoch 2 train: 160/360 charts, 1176 s
+  epoch 2 train: 180/360 charts, 1186 s
+  epoch 2 train: 200/360 charts, 1196 s
+  epoch 2 train: 220/360 charts, 1205 s
+  epoch 2 train: 240/360 charts, 1215 s
+  epoch 2 train: 260/360 charts, 1225 s
+  epoch 2 train: 280/360 charts, 1235 s
+  epoch 2 train: 300/360 charts, 1245 s
+  epoch 2 train: 320/360 charts, 1254 s
+  epoch 2 train: 340/360 charts, 1264 s
+  epoch 2 train: 360/360 charts, 1274 s
+  epoch 2 validation: 20/80 charts, 1352 s
+  epoch 2 validation: 40/80 charts, 1499 s
+  epoch 2 validation: 60/80 charts, 1578 s
+  epoch 2 validation: 80/80 charts, 1659 s
+{'epoch': 2, 'train_loss': 1.8689, 'val_cell_accuracy': 0.162, 'val_rnss': 0.495}
+  epoch 3 train: 20/360 charts, 1669 s
+  epoch 3 train: 40/360 charts, 1678 s
+  epoch 3 train: 60/360 charts, 1688 s
+  epoch 3 train: 80/360 charts, 1698 s
+  epoch 3 train: 100/360 charts, 1708 s
+  epoch 3 train: 120/360 charts, 1717 s
+  epoch 3 train: 140/360 charts, 1727 s
+  epoch 3 train: 160/360 charts, 1737 s
+  epoch 3 train: 180/360 charts, 1747 s
+  epoch 3 train: 200/360 charts, 1756 s
+  epoch 3 train: 220/360 charts, 1766 s
+  epoch 3 train: 240/360 charts, 1776 s
+  epoch 3 train: 260/360 charts, 1786 s
+  epoch 3 train: 280/360 charts, 1795 s
+  epoch 3 train: 300/360 charts, 1805 s
+  epoch 3 train: 320/360 charts, 1815 s
+  epoch 3 train: 340/360 charts, 1825 s
+  epoch 3 train: 360/360 charts, 1834 s
+  epoch 3 validation: 20/80 charts, 1951 s
+  epoch 3 validation: 40/80 charts, 2086 s
+  epoch 3 validation: 60/80 charts, 2157 s
+  epoch 3 validation: 80/80 charts, 2237 s
+{'epoch': 3, 'train_loss': 1.6535, 'val_cell_accuracy': 0.147, 'val_rnss': 0.478}
+{'trainable_parameters': 18879744, 'total_parameters': 282285696, 'training_charts': 360, 'best_epoch': 2, 'selection': 'highest validation cell accuracy', 'selection_split': 'validation', 'seconds': 2236.7}
+[colab] Executing cell 12/13 - deplot_chart-25...
+  adapted model, test split: 20/160 charts, 132 s
+  adapted model, test split: 40/160 charts, 196 s
+  adapted model, test split: 60/160 charts, 269 s
+  adapted model, test split: 80/160 charts, 370 s
+  adapted model, test split: 100/160 charts, 500 s
+  adapted model, test split: 120/160 charts, 634 s
+  adapted model, test split: 140/160 charts, 753 s
+  adapted model, test split: 160/160 charts, 885 s
+  adapted model, validation split: 20/80 charts, 78 s
+  adapted model, validation split: 40/80 charts, 225 s
+  adapted model, validation split: 60/80 charts, 304 s
+  adapted model, validation split: 80/80 charts, 385 s
+{'cell_accuracy': {'empty': 0.0, 'header_only': 0.007, 'medoid': 0.037, 'frozen': 0.16, 'adapted': 0.181}}
+{'rnss': {'empty': 0.0, 'header_only': 0.008, 'medoid': 0.172, 'frozen': 0.448, 'adapted': 0.447}}
+{'exact_table_match': {'frozen': 0.006, 'adapted': 0.0}}
+{'delta_vs_frozen': {'cell_accuracy': 0.021, 'rnss': -0.001, 'exact_table_match': -0.006}}
+{'by_chart_type': {'bar': {'n': 72, 'medoid': 0.0426, 'frozen': 0.1478, 'adapted': 0.1726}, 'line': {'n': 1, 'medoid': 0.375, 'frozen': 0.375, 'adapted': 0.375}, 'pie': {'n': 73, 'medoid': 0.0179, 'frozen': 0.1449, 'adapted': 0.1663}, 'stacked_bar': {'n': 14, 'medoid': 0.083, 'frozen': 0.2814, 'adapted': 0.2857}}}
+--- bar chart test-0000: cell accuracy 0.000 frozen -> 0.000 adapted
+<PIL.Image.Image image mode=RGB size=360x239 at 0x790A85D9DDC0>
+
+[Image saved to: /tmp/tmpog_jy3df.png]
+target:
+    TITLE |
+    (Thousands of Dollars) | 2015
+    Estimated decommissioning cost | 5.60375e+06
+    Effect of escalating costs (to | 1.12236e+06
+    Effect of escalating costs to | 8.9648e+06
+    Estimated future | 1.12055e+07
+    ... 4 more rows
+frozen model:
+    TITLE |
+    label | Value
+    Intense (dozen) | 2000
+    Intense communication set | 109510
+    Intense domain record | 109510
+    Intense resonance | 898910
+    ... 6 more rows
+adapted model:
+    TITLE |
+    label | Value
+    Intense (26mm) | 156
+    Intense communication ("Instrumental") | 1120110
+    Intense division ("Instrumental") | 898789
+    Entered message ("Entered message") | 1121411
+    ... 4 more rows
+--- line chart test-0072: cell accuracy 0.375 frozen -> 0.375 adapted
+<PIL.Image.Image image mode=RGB size=360x273 at 0x790A85D9D790>
+
+[Image saved to: /tmp/tmptgrj_4kv.png]
+target:
+    TITLE |
+    | $1,298
+    1695.23 | 1282.74
+    1805.83 | 537.69
+    2206.24 | 38.92
+frozen model:
+    TITLE |
+    | Weight
+    $1,298 | 1220
+    $1,800 | 570
+    $1,900 | 195
+    $2,000 | 2050
+    ... 1 more rows
+adapted model:
+    TITLE |
+    | 1,700 | 1,800
+    $1,298 | 1220 | 1000
+    $1,800 | 570 | 368
+    $1,700 | 1220 | 1000
+--- pie chart test-0073: cell accuracy 0.500 frozen -> 0.500 adapted
+<PIL.Image.Image image mode=RGB size=360x276 at 0x790A85D9E4B0>
+
+[Image saved to: /tmp/tmpylfb6shb.png]
+target:
+    TITLE |
+    Carrying value beginning of | 40.58%
+    Additions | 9.42%
+    Due to change in valuation | 18.84%
+    Other changes (1) | 3.5%
+    Carrying value end of period | 27.66%
+frozen model:
+    TITLE |
+    Carrying value beginning of | 0.4258
+    Additions | 0.0000
+    Due to change in valuation | 0.0000
+    Other changes (1) | 0.1884
+    Carrying value end of period | 0.1884
+    ... 1 more rows
+adapted model:
+    TITLE |
+    Carrying value beginning of | 0.4258
+    Additions | 0.0000
+    Due to change in valuation | 0.0000
+    Other changes (1) | 0.1884
+    Carrying value end of period | 0.1884
+--- stacked_bar chart test-0146: cell accuracy 0.167 frozen -> 0.167 adapted
+<PIL.Image.Image image mode=RGB size=360x355 at 0x790A85D9E0C0>
+
+[Image saved to: /tmp/tmpb8jb1ly6.png]
+target:
+    TITLE |
+    | of net revenue | 2013 | Increase/ decrease | 2014
+    Selling and marketing | 240996 | 10.2 | 257329 | 16333
+    General and administrative | 161374 | 6.9 | 147260 | 14114
+    Research and development | 105256 | 4.5 | 78184 | 27072
+    Depreciation and amortization | 13359 | 0.6 | 10634 | 2725
+    ... 1 more rows
+frozen model:
+    TITLE |
+    | of net revenue | 2013 | Increase/ decrease | 2014
+    General and marketing | 2.89 | 2.92 | 36.08 | 25.84
+    Research and development | 2.95 | 2.91 | 19.99 | 23.58
+    Depreciation and development | 2.71 | 2.71 | 16.09 | 2.06
+    Total operating expenses (1) | 1.93 | 1.93 | 1.99 | 1.99
+    ... 1 more rows
+adapted model:
+    TITLE |
+    | of net revenue | 2013 | Increase/ decrease | 2014
+    General and marketing | 2.86 | 2.80 | 36.08 | 28.83
+    Research and development | 1.19 | 1.37 | 11.71 | 23.86
+    Depreciation and development | 0.71 | 0.71 | 7.66 | 2.88
+    Total operating expenses (1) | 1.19 | 0.70 | 1.32 | 2.88
+{'adapted_beats_frozen': True, 'best_epoch': 2}
+Reading: cell accuracy rose (+0.021), RNSS stayed flat (-0.001), exact-table match fell (-0.006). The gain is in layout - more cells in the expected positions - not in reading more numbers correctly, which RNSS would show.
+run   data layers epochs       lr best  frozen adapted  d_cell  d_rnss
+  1 sample      2      3    1e-05    2   0.160   0.181  +0.021  -0.001
+{'report': 'outputs/deplot_chart_evaluation_report.json'}
+[colab] Executing cell 13/13 - deplot_chart-27...
+frozen model:
+    TITLE | Quarterly revenue 2025 (USD millions)
+    Quarter | Quarterly revenue
+    Q1 | 120
+    Q2 | 135
+    Q3 | 150
+    Q4 | 180
+adapted model:
+    TITLE | Quarterly revenue 2025 (USD millions)
+    Quarter | Quarterly revenue
+    Q1 | 120
+    Q2 | 135
+    Q3 | 150
+    Q4 | 180
+{'drawn_chart_cell_accuracy': {'frozen': 0.9, 'adapted': 0.9}}
+{'artifact': 'outputs/deplot_chart_adapter', 'format': 'org.valcorza.deplot.adapter.v1', 'tensors': 29, 'bytes': 75522608, 'sha256': 'c04d63c375546183...', 'best_epoch': 2}
+{'reload_parity': {'identical_tables': 8, 'of': 8}, 'reloaded_best_epoch': 2}
+['deplot_chart_adapter', 'deplot_chart_evaluation_report.json', 'deplot_chart_input_manifest.json', 'deplot_chart_result.json', 'deplot_chart_table.csv', 'deplot_chart_train.jsonl']
+[colab] Saving notebook with outputs to '/home/kurt/colab-runs/deplot-chart-pipeline-a1b2b88-7026ae/deplot_chart_colab_a1b2b88_colab-cli-t4_output.ipynb'...

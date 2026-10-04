@@ -54,7 +54,14 @@ from typing import Any
 
 from PIL import Image
 
-from .pipeline import CELL_SEPARATOR, MODEL_ID, ROW_SEPARATOR, parse_table, validate_image
+from .pipeline import (
+    CELL_SEPARATOR,
+    MAX_EVAL_RECORDS,
+    MODEL_ID,
+    ROW_SEPARATOR,
+    parse_table,
+    validate_image,
+)
 
 CORPUS_NAME = "SynthChartNet"
 CORPUS_REPO = "docling-project/SynthChartNet"
@@ -87,6 +94,11 @@ CHART_TYPES = ("bar", "pie", "stacked_bar", "line")
 TRANSPOSED_TYPES = frozenset({"bar", "pie", "stacked_bar"})
 MIN_RECORDS = 8
 MAX_RECORDS = 5_000
+# BYOD: the notebook selects the epoch on validation and scores and reload-checks the test split, so a split
+# dataset needs at least this many validation and test records besides MIN_RECORDS training records, and no
+# more than MAX_EVAL_RECORDS in either (review DPC-m2).
+MIN_VAL_RECORDS = 2
+MIN_TEST_RECORDS = 2
 # Target ceiling: the linearised table is also the decoder's teacher-forcing target, so it is bounded to
 # keep it well inside MAX_TARGET_TOKENS of the pipeline (the shard's longest target under it is 360 tokens).
 MAX_TARGET_CHARS = 512
@@ -488,10 +500,14 @@ def split_dataset(
 ) -> dict[str, list[dict[str, Any]]]:
     """Seeded split of a BYOD dataset into train/validation/test **by chart image**: records sharing either
     a declared `image_id` or the exact image bytes land in the same split, so a test chart is never seen in
-    training under a different name or id."""
+    training under a different name or id.
+
+    The split must leave at least MIN_RECORDS training, MIN_VAL_RECORDS validation and MIN_TEST_RECORDS test
+    records, and at most MAX_EVAL_RECORDS validation and test records (the evaluation ceiling); a refusal
+    names the split, its count and the dataset sizes that work (`byod_record_limits`) before a model runs."""
     if not (0.0 <= val_fraction < 1.0 and 0.0 < test_fraction < 1.0 and val_fraction + test_fraction < 1.0):
         raise ValueError("fractions must satisfy 0 <= val < 1, 0 < test < 1, val + test < 1")
-    checked = validate_dataset(records, base_dir=base_dir)["records"]
+    checked = validate_dataset(records, min_records=1, base_dir=base_dir)["records"]
     parents = list(range(len(checked)))
 
     def find(index: int) -> int:
@@ -527,11 +543,49 @@ def split_dataset(
             splits["validation"].extend(group)
         else:
             splits["train"].extend(group)
-    if len(splits["train"]) < MIN_RECORDS:
+    needed = {"train": MIN_RECORDS, "validation": MIN_VAL_RECORDS, "test": MIN_TEST_RECORDS}
+    short = [(name, len(splits[name]), least) for name, least in needed.items() if len(splits[name]) < least]
+    long = [
+        (name, len(splits[name]), MAX_EVAL_RECORDS)
+        for name in ("validation", "test")
+        if len(splits[name]) > MAX_EVAL_RECORDS
+    ]
+    if short or long:
+        try:
+            low, high = byod_record_limits(val_fraction, test_fraction)
+            sizes = f"a dataset of one record per chart image needs {low}..{high} records"
+        except ValueError:
+            sizes = "no dataset size gives every split its bounds at these fractions"
+        name, have, bound = (short or long)[0]
+        rule = f"at least {bound} are required" if short else f"at most {bound} are scored"
         raise ValueError(
-            f"split leaves {len(splits['train'])} training records; at least {MIN_RECORDS} are required"
+            f"the {name} split has {have} records ({rule}): {len(checked)} records on {len(groups)} chart "
+            f"images split by image into train/validation/test as {len(splits['train'])}/"
+            f"{len(splits['validation'])}/{len(splits['test'])}; {sizes}. "
+            + ("Add records" if short else "Use fewer records")
         )
     return splits
+
+
+def byod_record_limits(val_fraction: float = 0.15, test_fraction: float = 0.2) -> tuple[int, int]:
+    """Smallest and largest dataset (one record per chart image) that `split_dataset` accepts at these
+    fractions: every split at least its minimum, the validation and test splits at most MAX_EVAL_RECORDS."""
+    fits = []
+    for n in range(1, MAX_RECORDS + 1):
+        n_test = max(1, round(n * test_fraction))
+        n_val = round(n * val_fraction)
+        n_train = n - n_test - n_val
+        if (
+            n_test >= MIN_TEST_RECORDS
+            and n_val >= MIN_VAL_RECORDS
+            and n_train >= MIN_RECORDS
+            and n_test <= MAX_EVAL_RECORDS
+            and n_val <= MAX_EVAL_RECORDS
+        ):
+            fits.append(n)
+    if not fits:
+        raise ValueError("no dataset within MAX_RECORDS satisfies the split")
+    return fits[0], fits[-1]
 
 
 def load_byod_dataset(path: str | Path) -> list[dict[str, Any]]:
