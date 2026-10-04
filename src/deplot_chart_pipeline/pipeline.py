@@ -504,10 +504,15 @@ class DePlotPipeline:
         return self._model, self._processor
 
     def predict(
-        self, records: Sequence[Mapping[str, Any]], *, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS
+        self,
+        records: Sequence[Mapping[str, Any]],
+        *,
+        max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS,
+        progress: Callable[[int, int], None] | None = None,
     ) -> list[dict[str, Any]]:
         """Extract the table of every validated record's chart; one `extract_table` result per record, in
-        order, with the record's `id` and `chart_type` attached."""
+        order, with the record's `id` and `chart_type` attached. `progress(done, total)` is called after
+        every chart, so a caller can report a long evaluation (review DPC-m1)."""
         from .samples import validate_dataset
 
         checked = validate_dataset(records, min_records=1, max_records=MAX_EVAL_RECORDS)["records"]
@@ -517,20 +522,27 @@ class DePlotPipeline:
                 image.load()
                 result = self.extract_table(image, max_new_tokens=max_new_tokens)
             out.append({"id": record["id"], "chart_type": record["chart_type"], **result})
+            if progress:
+                progress(len(out), len(checked))
         return out
 
     def evaluate(
-        self, records: Sequence[Mapping[str, Any]], *, max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS
+        self,
+        records: Sequence[Mapping[str, Any]],
+        *,
+        max_new_tokens: int = DEFAULT_MAX_NEW_TOKENS,
+        progress: Callable[[int, int], None] | None = None,
     ) -> dict[str, Any]:
         """Extract every record's table and score it against the record's target: mean relaxed position-wise
         cell accuracy, RNSS, exact-table match, the truncation rate and a per-chart-type breakdown (see
-        `metrics.chart_metrics`)."""
+        `metrics.chart_metrics`). `adapted` says whether the model in memory carries an adaptation, so a
+        caller can refuse to report an adapted model as the frozen one; `progress` is passed to `predict`."""
         from .metrics import chart_metrics
         from .samples import validate_dataset
 
         checked = validate_dataset(records, min_records=1, max_records=MAX_EVAL_RECORDS)["records"]
         started = time.perf_counter()
-        results = self.predict(checked, max_new_tokens=max_new_tokens)
+        results = self.predict(checked, max_new_tokens=max_new_tokens, progress=progress)
         metrics = chart_metrics([r["text"] for r in results], checked)
         metrics.update(
             {
@@ -600,6 +612,7 @@ class DePlotPipeline:
         trainable_decoder_layers: int = DEFAULT_TRAINABLE_DECODER_LAYERS,
         seed: int = 0,
         progress: Callable[[dict[str, Any]], None] | None = None,
+        chart_progress: Callable[[dict[str, Any]], None] | None = None,
     ) -> dict[str, Any]:
         """Bounded supervised fine-tuning on validated chart/table records.
 
@@ -611,8 +624,23 @@ class DePlotPipeline:
         decoded with teacher forcing and scored with the model's own cross-entropy (padding ignored); AdamW at
         a fixed learning rate with gradient clipping at 1.0, no scheduler. Epoch 0 records the frozen model's
         validation metrics; the epoch with the highest validation cell accuracy is kept (ties keep the
-        earlier)."""
+        earlier).
+
+        `progress` receives one entry per epoch; `chart_progress` receives
+        `{"stage": "train" | "validation", "epoch", "charts", "of"}` after every training batch and every
+        validation chart, so a caller can report a long epoch (review DPC-m1).
+
+        An already adapted pipeline (or one with a loaded artifact) is refused: training would start from the
+        adapted weights, record them as the "frozen model" at epoch 0 and export only this run's tensors, so
+        the artifact would not reproduce the model (review DPC-M2). Build a fresh pipeline with
+        `from_pretrained()` first."""
         from .samples import validate_dataset
+
+        if self.adapter is not None:
+            raise ValueError(
+                "this pipeline is already adapted; adapt() starts from the pretrained base, so build a fresh "
+                "pipeline with from_pretrained() first"
+            )
 
         if isinstance(epochs, bool) or not isinstance(epochs, int) or not 1 <= epochs <= 20:
             raise ValueError("epochs must be an int in 1..20")
@@ -638,13 +666,18 @@ class DePlotPipeline:
         original_adapter = copy.deepcopy(self.adapter)
         initial_state = {k: v.detach().clone() for k, v in model.state_dict().items() if k in wanted}
 
-        def score_val() -> dict[str, Any] | None:
+        def score_val(epoch: int) -> dict[str, Any] | None:
             if not val_checked:
                 return None
             model.eval()
+
+            def report(done: int, total: int) -> None:
+                if chart_progress:
+                    chart_progress({"stage": "validation", "epoch": epoch, "charts": done, "of": total})
+
             return {
                 k: v
-                for k, v in self.evaluate(val_checked).items()
+                for k, v in self.evaluate(val_checked, progress=report).items()
                 if k in ("cell_accuracy", "rnss", "exact_table_match", "n")
             }
 
@@ -659,7 +692,7 @@ class DePlotPipeline:
             entry: dict[str, Any] = {
                 "epoch": 0,
                 "train_loss": None,
-                "val": score_val(),
+                "val": score_val(0),
                 "note": "frozen model",
             }
             history.append(entry)
@@ -690,8 +723,11 @@ class DePlotPipeline:
                     torch.nn.utils.clip_grad_norm_(params, 1.0)
                     optimiser.step()
                     losses.append(float(out.loss.detach()))
+                    if chart_progress:
+                        done = min(start + batch_size, len(order))
+                        chart_progress({"stage": "train", "epoch": epoch, "charts": done, "of": len(order)})
                 model.eval()
-                entry = {"epoch": epoch, "train_loss": sum(losses) / len(losses), "val": score_val()}
+                entry = {"epoch": epoch, "train_loss": sum(losses) / len(losses), "val": score_val(epoch)}
                 history.append(entry)
                 if progress:
                     progress(entry)
