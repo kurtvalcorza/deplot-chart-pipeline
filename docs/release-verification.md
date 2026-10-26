@@ -213,6 +213,8 @@ the current blob (or a Kaggle run) with `restarted: false` recorded here with th
 experiment (Section 10) and of BYOD after a default run; and the REL12 BYOD exercise (one compatible and one
 incompatible input).
 
+The current blob `f3a82454` (code commit `3276b77`) shows a refused BYOD input as one `Refused: <file>: <reason>` line with no traceback, removes the earlier run's results and `outputs/` files and stops Run all at that cell, while genuine failures keep their traceback (NOTEBOOK_SPEC DAT19/DAT20); its hosted Colab T4 runs (the default path and a scripted refusal, `USE_BYOD=True;BYOD_PATH='/content/sample_data'`) are pending, and the hosted runs of earlier blobs, including `c78f3db08147`, are history for it (REL14).
+
 Facts a reviewer should weigh before promotion: SynthChartNet is not part of DePlot's fine-tuning mixture, so this is
 adaptation to a new chart family; the target format is a decision recorded in `samples.py` from the frozen model's own
 outputs (bar, pie and stacked-bar OTSL tables transposed, line tables kept, `TITLE |` first), and cell accuracy is

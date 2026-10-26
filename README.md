@@ -62,6 +62,8 @@ weights/deplot/
 
 **Candidate** — the notebook was regenerated to fix review findings DPC-M1..M3 and DPC-m1..m4 (isolated uv environment with no restart, re-runs that start from the pretrained model, the guided layer, stated durations and progress, a BYOD contract that matches its checks, the charts shown); no hosted run of the new blob exists yet. The previous blob `90d9093cced4` (committed at `dd5724e`) completed on a fresh Kaggle Tesla T4 runtime on 2026-09-26 only after an interpreter restart following the install cell (2 passes: 189.3 s, then 11/11 code cells in 4,793.7 s), which is not a one-pass `Run all`, so it is not Release-grade evidence; see `docs/release-verification.md` and `STATUS.md`. Static and unit checks — including the standalone generator parity checks — are necessary but never the evidence; a one-pass hosted run is.
 
+The current blob `f3a82454` (code commit `3276b77`) shows a refused BYOD input as one `Refused: <file>: <reason>` line with no traceback, removes the earlier run's results and `outputs/` files and stops Run all at that cell, while genuine failures keep their traceback (NOTEBOOK_SPEC DAT19/DAT20); its hosted Colab T4 runs (the default path and a scripted refusal, `USE_BYOD=True;BYOD_PATH='/content/sample_data'`) are pending, and the hosted runs of earlier blobs, including `c78f3db08147`, are history for it (REL14).
+
 ## Documentation
 
 - `MODEL_CARD.md` — MODEL_CARD_SPEC 1.1 card, provenance digests, input/output contract, measured runtime.
