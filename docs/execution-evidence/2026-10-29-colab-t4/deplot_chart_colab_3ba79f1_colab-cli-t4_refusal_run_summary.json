@@ -1,0 +1,72 @@
+{
+  "repo": "deplot-chart-pipeline",
+  "sha": "3ba79f17021a6dc79a197ed49b72811abcd622d3",
+  "notebook": "tutorials/deplot_chart_colab.ipynb",
+  "blob": "f3a8245413de2b662bada1c22bf40b1e175a864b",
+  "gpu": "T4",
+  "session": "suite-deplot-3ba79f1-7026",
+  "started_utc": "2026-10-29T03:12:28+00:00",
+  "runner": "Colab CLI `colab exec -f` on a fresh session (not a browser Run all)",
+  "overrides": [
+    {
+      "name": "USE_BYOD",
+      "from": "False",
+      "to": "True"
+    },
+    {
+      "name": "BYOD_PATH",
+      "from": "''",
+      "to": "'/content/sample_data'"
+    }
+  ],
+  "run_copy_blob": "76fb1cbc3d462a562d0480b0eea8e55ce838cd40",
+  "run_copy_sha256": "edbf8803d167998b916442fd4f1a2b55150e2c6e849a2e82a30140533553b591",
+  "run_copy_note": "refusal run: the run copy is the committed notebook with the listed assignment overrides, cut immediately after the refusal cell and re-serialised (nbformat layout); input_unchanged compares against that copy",
+  "truncated_after_cell": "deplot_chart-17",
+  "refusal_cell_ref": "deplot_chart-17",
+  "refusal_cell_index": 8,
+  "cells_dropped": 11,
+  "code_cells_dropped": 5,
+  "original_sha256": "eac61a87bcc5373229eb71fe1cde94ecab857253d777552523015335100f98b9",
+  "status": "[suite-deplot-3ba79f1-7026] gpu-t4-s-usw4a2-3r9sr4x396gz4 | Hardware: T4 | Shape: Standard | Variant: GPU | Status: IDLE",
+  "exec_exit_code": 0,
+  "stopped": true,
+  "stop_verified": true,
+  "wall_s": 153.6,
+  "input_unchanged": true,
+  "executed_file": "deplot_chart_colab_3ba79f1_colab-cli-t4_output.ipynb",
+  "log_cells": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "log_total": 8,
+  "code_cells": 8,
+  "executed_cells": 5,
+  "errors": [
+    {
+      "cell": "deplot_chart-17",
+      "ename": "IsolatedCellRefusal",
+      "evalue": "sample_data: ValueError: No records.jsonl or records.json found in /content/sample_data. Put one records file of {id, image, target_text} objects beside the images (image paths relative to it), then run this cell again (the earlier results of this session and their outputs/ files were removed)."
+    }
+  ],
+  "execution_counts": [],
+  "sequential": null,
+  "executed_sha256": "b1cdbd97b6071d13b4f4553d1d18eed5ff89eccd18c5d8b908b9a264a9baa677",
+  "log_sequential_complete": true,
+  "mode": "expect_refusal",
+  "refusal_line": "Refused: sample_data: ValueError: No records.jsonl or records.json found in /content/sample_data. Put one records file of {id, image, target_text} objects beside the images (image paths relative to it), then run this cell again (the earlier results of this session and their outputs/ files were removed).",
+  "halting_cell_index": 8,
+  "halting_cell_id": "deplot_chart-17",
+  "error_cells": [
+    8
+  ],
+  "refusal_fail_reasons": [],
+  "refusal_ok": true,
+  "verdict": "PASS"
+}
